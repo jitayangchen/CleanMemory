@@ -1,7 +1,9 @@
 package cn.com.findfine.cleanmemory;
 
 import android.accessibilityservice.AccessibilityService;
+import android.accessibilityservice.AccessibilityServiceInfo;
 import android.content.Intent;
+import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
@@ -16,27 +18,48 @@ public class MyAccessibilityService extends AccessibilityService {
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
-//        Log.i("TAG", "------------onServiceConnected---------");
+        Log.i("TAG", "------------onServiceConnected---------");
+        AccessibilityServiceInfo serviceInfo = new AccessibilityServiceInfo();
+        serviceInfo.eventTypes = AccessibilityEvent.TYPES_ALL_MASK;
+        serviceInfo.feedbackType = AccessibilityServiceInfo.FEEDBACK_SPOKEN;
+//        serviceInfo.packageNames = new String[]{""};
+        serviceInfo.notificationTimeout=100;
+        setServiceInfo(serviceInfo);
     }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent accessibilityEvent) {
-//        Log.i("TAG", "------------onAccessibilityEvent--------- " + accessibilityEvent.getSource().toString());
-        List<AccessibilityNodeInfo> text1 = accessibilityEvent.getSource().findAccessibilityNodeInfosByText("TEST");
-        if (text1 != null && text1.size() > 0) {
-            AccessibilityNodeInfo text = text1.get(0);
-            text.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+        Log.i("TAG", "------------onAccessibilityEvent--------- ");
+        AccessibilityNodeInfo source = accessibilityEvent.getSource();
+        if (source != null) {
+            List<AccessibilityNodeInfo> forceStops = accessibilityEvent.getSource().findAccessibilityNodeInfosByText("FORCE STOP");
+            for (AccessibilityNodeInfo forceStop : forceStops) {
+                if (forceStop != null && "android.widget.Button".equals(forceStop.getClassName())) {
+                    if (forceStop.isEnabled()) {
+                        forceStop.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                    }
+                }
+            }
+
+            List<AccessibilityNodeInfo> dialogOks = accessibilityEvent.getSource().findAccessibilityNodeInfosByText("OK");
+            for (AccessibilityNodeInfo dialogOk : dialogOks) {
+                if (dialogOk != null && "android.widget.Button".equals(dialogOk.getClassName())) {
+                    if (dialogOk.isEnabled()) {
+                        dialogOk.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                    }
+                }
+            }
         }
     }
 
     @Override
     public void onInterrupt() {
-//        Log.i("TAG", "------------onInterrupt---------");
+        Log.i("TAG", "------------onInterrupt---------");
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-//        Log.i("TAG", "------------onUnbind---------");
+        Log.i("TAG", "------------onUnbind---------");
         return super.onUnbind(intent);
     }
 }

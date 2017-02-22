@@ -2,7 +2,10 @@ package cn.com.findfine.cleanmemory;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -32,7 +35,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 //                Intent intent = new Intent(MainActivity.this, MyAccessibilityService.class);
 //                startService(intent);
-                getRunningApp();
+//                getRunningApp();
+
+                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                Uri uri = Uri.fromParts("package", "com.UCMobile", null);
+                intent.setData(uri);
+                startActivity(intent);
             }
         });
 
@@ -41,7 +49,9 @@ public class MainActivity extends AppCompatActivity {
         btnTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i("TAG", "Auto Click hahaha");
+//                Log.i("TAG", "Auto Click hahaha");
+                Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                startActivity(intent);
             }
         });
     }
