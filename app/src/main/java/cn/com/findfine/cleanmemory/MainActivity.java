@@ -51,7 +51,12 @@ public class MainActivity extends AppCompatActivity {
 //                executeCmd("am force-stop com.taobao.taobao");
 //                executeCmd(new String[]{"am", "force-stop" ,"com.taobao.taobao"});
 //                executeCmd(new String[]{"ls"});
-                execCommand("ls");
+//                execCommand("pm list packages -3");
+//                execCommand("am force-stop com.clean.spaceplus");
+//                execCommand("pm grant cn.com.findfine.cleanmemory android.permission.DUMP");
+                execCommand("pm grant com.oasisfeng.greenify android.permission.WRITE_SECURE_SETTINGS");
+                execCommand("pm grant com.oasisfeng.greenify android.permission.DUMP");
+                execCommand("pm grant com.oasisfeng.greenify android.permission.READ_LOGS");
             }
         });
 
@@ -88,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void executeCmd(String[] cmd) {
+    private void executeCmd(String cmd) {
 //        new Thread() {
 //            @Override
 //            public void run() {
@@ -100,9 +105,9 @@ public class MainActivity extends AppCompatActivity {
                     BufferedReader in = new BufferedReader(new InputStreamReader(exec.getInputStream()));
                     String line = in.readLine();
                     Log.i("TAG", " ==== " + line);
-//                    while ((line = in.readLine()) != null) {
-//                        Log.i("TAG", line);
-//                    }
+                    while ((line = in.readLine()) != null) {
+                        Log.i("TAG", line);
+                    }
                     in.close();
                     exec.waitFor();
                 } catch (IOException e) {
@@ -114,22 +119,25 @@ public class MainActivity extends AppCompatActivity {
 //        }.start();
     }
 
+    /************************************************************************/
+    /*****************    ProcessBuilder.redirectErrorStream() **************/
+    /************************************************************************/
     public void execCommand(String command) {
         Runtime runtime = Runtime.getRuntime();
         try {
             Process proc = runtime.exec(command);
-            if (proc.waitFor() != 0) {
-                System.err.println("exit value = " + proc.exitValue());
+            BufferedReader in;
+            if (proc.waitFor() == 0) {
+                Log.i("TAG", "-------------OK-----------");
+                in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+            } else {
+                Log.e("TAG", "ERROR = " + proc.exitValue());
+                in = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
             }
-            BufferedReader in = new BufferedReader(new InputStreamReader(
-                    proc.getInputStream()));
-            StringBuffer stringBuffer = new StringBuffer();
             String line = null;
             while ((line = in.readLine()) != null) {
-                stringBuffer.append(line+"-");
+                Log.i("TAG", line);
             }
-            System.out.println(stringBuffer.toString());
-
         } catch (Exception e) {
             System.err.println(e);
         }
